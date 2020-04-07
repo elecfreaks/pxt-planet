@@ -103,7 +103,7 @@ namespace Planet {
         //% block="inch"
         Distance_Unit_inch,
     }
-    export enum ledStateList {
+    export enum GeneralStateList {
         //% block="On"
         On,
 
@@ -740,7 +740,7 @@ namespace Planet {
     //% ledstate.fieldEditor="gridpicker"
     //% ledstate.fieldOptions.columns=2
     //% subcategory=Output
-    export function LED(Rjpin: DigitalRJPin, ledstate: ledStateList): void {
+    export function LED(Rjpin: DigitalRJPin, ledstate: GeneralStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
             case DigitalRJPin.J1:
@@ -757,10 +757,44 @@ namespace Planet {
                 break;
         }
         switch (ledstate) {
-            case ledStateList.On:
+            case GeneralStateList.On:
                 pins.digitalWritePin(pin, 1)
                 break;
-            case ledStateList.Off:
+            case GeneralStateList.Off:
+                pins.digitalWritePin(pin, 0)
+                break;
+        }
+    }
+    /**
+    * toggle laserSensor
+    */
+    //% blockId=laserSensor block="at pin %Rjpin laser toggle to %laserstate"
+    //% Rjpin.fieldEditor="gridpicker"
+    //% Rjpin.fieldOptions.columns=2
+    //% ledstate.fieldEditor="gridpicker"
+    //% ledstate.fieldOptions.columns=2
+    //% subcategory=Output
+    export function laserSensor(Rjpin: DigitalRJPin, laserstate: GeneralStateList): void {
+        let pin = DigitalPin.P1
+        switch (Rjpin) {
+            case DigitalRJPin.J1:
+                pin = DigitalPin.P1
+                break;
+            case DigitalRJPin.J2:
+                pin = DigitalPin.P2
+                break;
+            case DigitalRJPin.J3:
+                pin = DigitalPin.P13
+                break;
+            case DigitalRJPin.J4:
+                pin = DigitalPin.P15
+                break;
+        }
+        switch (laserstate) {
+            case GeneralStateList.On:
+                pins.digitalWritePin(pin, 1)
+                break;
+            case GeneralStateList.Off:
                 pins.digitalWritePin(pin, 0)
                 break;
         }
