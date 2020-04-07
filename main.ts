@@ -530,31 +530,6 @@ namespace Planet {
         return Math.round(dust)
     }
 
-    //% block="at pin IIC BME280 %state value"
-    //% subcategory=Sensor 
-    export function octopus_BME280(state: BME280_state): number {
-        switch (state) {
-            case 0:
-                get();
-                return Math.round(T);
-                break;
-            case 1:
-                get();
-                return Math.round(H);
-                break;
-            case 2:
-                get();
-                return Math.round(P / 100);
-                break;
-            case 3:
-                get();
-                return Math.round(1015 - (P / 100)) * 9
-                break;
-            default:
-                return 0
-        }
-        return 0;
-    }
     //% shim=DS18B20::Temperature
     export function Temperature_read(p: number): number {
         // Fake function for simulator
@@ -585,7 +560,61 @@ namespace Planet {
         temp = temp / 100
         return temp
     }
+    /**
+    * get UV level value (0~15)
+    * @param waterlevelpin describe parameter here, eg: AnalogRJPin.J1
+    */
+    //% blockId="readUVLevel" block="at pin %Rjpin UV level(0~15)"
+    //% Rjpin.fieldEditor="gridpicker"
+    //% Rjpin.fieldOptions.columns=2
+    //% subcategory=Sensor 
+    export function UVLevel(Rjpin: AnalogRJPin): number {
+        let pin = AnalogPin.P1
+        switch (Rjpin) {
+            case AnalogRJPin.J1:
+                pin = AnalogPin.P1
+                break;
+            case AnalogRJPin.J2:
+                pin = AnalogPin.P2
+                break;
+        }
+        let UVlevel = 0;
+        UVlevel = pins.map(
+            pins.analogReadPin(pin),
+            0,
+            1023,
+            0,
+            15
+        );
+        return Math.round(UVlevel)
+    }
 
+
+    //% block="at pin IIC BME280 %state value"
+    //% subcategory=Sensor 
+    export function octopus_BME280(state: BME280_state): number {
+        switch (state) {
+            case 0:
+                get();
+                return Math.round(T);
+                break;
+            case 1:
+                get();
+                return Math.round(H);
+                break;
+            case 2:
+                get();
+                return Math.round(P / 100);
+                break;
+            case 3:
+                get();
+                return Math.round(1015 - (P / 100)) * 9
+                break;
+            default:
+                return 0
+        }
+        return 0;
+    }
 
     /**Input sensor*******************星宿传感器************************************* */
 
