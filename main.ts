@@ -431,11 +431,14 @@ namespace Planet {
         soilmoisture = voltage;
         return Math.round(soilmoisture);
     }
-
-    //% blockId="PIR" block="at pin %Rjpin detects motion"
+    /**
+    * TODO: Detect soil moisture value(0~100%)
+    * @param soilmoisturepin describe parameter here, eg: DigitalRJPin.J1
+    */
+    //% blockId="PIR" block="at pin %Rjpin PIR detects motion"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor
+    //% subcategory=Sensor weight=20
     export function PIR(Rjpin: DigitalRJPin): boolean {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -461,26 +464,20 @@ namespace Planet {
     }
     /**
     * get water level value (0~100)
-    * @param waterlevelpin describe parameter here, eg: AnalogPin.P1
+    * @param waterlevelpin describe parameter here, eg: AnalogRJPin.J1
     */
     //% blockId="readWaterLevel" block="at pin %Rjpin water level(0~100)"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor
-    export function WaterLevel(Rjpin: DigitalRJPin): number {
+    //% subcategory=Sensor weight=25
+    export function WaterLevel(Rjpin: AnalogRJPin): number {
         let pin = AnalogPin.P1
         switch (Rjpin) {
-            case DigitalRJPin.J1:
+            case AnalogRJPin.J1:
                 pin = AnalogPin.P1
                 break;
-            case DigitalRJPin.J2:
+            case AnalogRJPin.J2:
                 pin = AnalogPin.P2
-                break;
-            case DigitalRJPin.J3:
-                pin = AnalogPin.P13
-                break;
-            case DigitalRJPin.J4:
-                pin = AnalogPin.P15
                 break;
         }
         let voltage = 0, waterlevel = 0;
