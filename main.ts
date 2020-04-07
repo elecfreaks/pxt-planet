@@ -3,13 +3,8 @@
 */
 //% color=#0000ff  icon="\uf06d" block="Planet" blockId="Planet"
 namespace Planet {
-    let weatherMonitorStarted = false;
-    // Keep Track of weather monitoring variables
-    //let numRainDumps = 0
-    //let numWindTurns = 0
-    //let windMPH = 0
 
-    // BME280 Addresses
+    ///////////////////////////// BME280 
     let BME280_I2C_ADDR = 0x76
     let dig_T1 = getUInt16LE(0x88)
     let dig_T2 = getInt16LE(0x8A)
@@ -38,12 +33,10 @@ namespace Planet {
     setreg(0xF5, 0x0C)
     setreg(0xF4, 0x2F)
 
-    // Stores compensation values for Temperature (must be read from BME280 NVM)
     let digT1Val = 0
     let digT2Val = 0
     let digT3Val = 0
 
-    // Stores compensation values for humidity (must be read from BME280 NVM)
     let digH1Val = 0
     let digH2Val = 0
     let digH3Val = 0
@@ -51,15 +44,12 @@ namespace Planet {
     let digH5Val = 0
     let digH6Val = 0
 
-    // Buffer to hold pressure compensation values to pass to the C++ compensation function
     let digPBuf: Buffer
 
-    // BME Compensation Parameter Addresses for Temperature
     const digT1 = 0x88
     const digT2 = 0x8A
     const digT3 = 0x8C
 
-    // BME Compensation Parameter Addresses for Pressure
     const digP1 = 0x8E
     const digP2 = 0x90
     const digP3 = 0x92
@@ -70,7 +60,6 @@ namespace Planet {
     const digP8 = 0x9C
     const digP9 = 0x9E
 
-    // BME Compensation Parameter Addresses for Humidity
     const digH1 = 0xA1
     const digH2 = 0xE1
     const digH3 = 0xE3
@@ -79,6 +68,30 @@ namespace Planet {
     const e6Reg = 0xE6
     const digH6 = 0xE7
 
+    ///////////////////////// matrixInit/////////////////////
+
+    let initializedMatrix = false
+    const HT16K33_ADDRESS = 0x70
+    const HT16K33_BLINK_CMD = 0x80
+    const HT16K33_BLINK_DISPLAYON = 0x01
+    const HT16K33_CMD_BRIGHTNESS = 0xE0
+    let matBuf = pins.createBuffer(17)
+    function matrixInit() {
+        i2ccmd(HT16K33_ADDRESS, 0x21);// turn on oscillator
+        i2ccmd(HT16K33_ADDRESS, HT16K33_BLINK_CMD | HT16K33_BLINK_DISPLAYON | (0 << 1));
+        i2ccmd(HT16K33_ADDRESS, HT16K33_CMD_BRIGHTNESS | 0xF);
+    }
+    function i2ccmd(addr: number, value: number) {
+        let buf = pins.createBuffer(1)
+        buf[0] = value
+        pins.i2cWriteBuffer(addr, buf)
+    }
+    function matrixShow() {
+        matBuf[0] = 0x00;
+        pins.i2cWriteBuffer(HT16K33_ADDRESS, matBuf);
+    }
+
+    ///////////////////////////////
     export enum DigitalRJPin {
         //% block="J1 (P1,P8)"
         J1,
@@ -141,6 +154,19 @@ namespace Planet {
 
         //% block="altitude(M)" enumval=3
         BME280_altitude,
+    }
+
+    export enum emojiList {
+        //% block="😆"
+        Grinning_Squinting_Face,
+        //% block="😐"
+        Neutral_Face,
+        //% block="😞"
+        Sad_Face,
+        //% block="🙂"
+        Slightly_Smiling_Face,
+        //% block="😠"
+        Angry_Face
     }
 
 
@@ -739,7 +765,7 @@ namespace Planet {
     //% Rjpin.fieldOptions.columns=2
     //% ledstate.fieldEditor="gridpicker"
     //% ledstate.fieldOptions.columns=2
-    //% subcategory=Output
+    //% subcategory=Output group=basic
     export function LED(Rjpin: DigitalRJPin, ledstate: GeneralStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -773,7 +799,7 @@ namespace Planet {
     //% Rjpin.fieldOptions.columns=2
     //% laserstate.fieldEditor="gridpicker"
     //% laserstate.fieldOptions.columns=2
-    //% subcategory=Output
+    //% subcategory=Output group=basic
     export function laserSensor(Rjpin: DigitalRJPin, laserstate: GeneralStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -807,7 +833,7 @@ namespace Planet {
     //% Rjpin.fieldOptions.columns=2
     //% Relaystate.fieldEditor="gridpicker"
     //% Relaystate.fieldOptions.columns=2
-    //% subcategory=Output
+    //% subcategory=Output group=basic
     export function Relay(Rjpin: DigitalRJPin, Relaystate: RelayStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -832,6 +858,101 @@ namespace Planet {
                 pins.digitalWritePin(pin, 1)
                 break;
         }
+    }
+    //% block="at pin IIC Matrix Refresh"
+    //% group=Matrix
+    export function MatrixRefresh(): void {
+        if (!initializedMatrix) {
+            matrixInit();
+            initializedMatrix = true;
+        }
+        matrixShow();
+    }
+
+    //% block="at pin IIC Matrix Clear"
+    //% group=Matrix
+    export function MatrixClear(): void {
+        if (!initializedMatrix) {
+            matrixInit();
+            initializedMatrix = true;
+        }
+        for (let i = 0; i < 16; i++) {
+            matBuf[i + 1] = 0;
+        }
+        matrixShow();
+    }
+    //% block="at pin IIC Matrix Draw|X %x|Y %y"
+    //% group=Matrix
+    export function MatrixDraw(x: number, y: number): void {
+        if (!initializedMatrix) {
+            matrixInit();
+            initializedMatrix = true;
+        }
+        x = Math.round(x)
+        y = Math.round(y)
+
+        let idx = y * 2 + Math.idiv(x, 8);
+
+        let tmp = matBuf[idx + 1];
+        tmp |= (1 << (x % 8));
+        matBuf[idx + 1] = tmp;
+    }
+    //% block="at pin IIC Matrix show emoji %ID"
+    //% group=Matrix
+    export function MatrixEmoji(ID: emojiList) {
+        MatrixClear();
+        let point;
+        switch (ID) {
+            case 0:
+                point = [[2, 0], [13, 0],
+                [3, 1], [12, 1],
+                [4, 2], [11, 2],
+                [3, 3], [12, 3],
+                [2, 4], [5, 4], [6, 4], [7, 4], [8, 4], [9, 4], [10, 4], [13, 4],
+                [5, 5], [7, 5], [8, 5], [10, 5],
+                [5, 6], [10, 6],
+                [6, 7], [7, 7], [8, 7], [9, 7]
+                ];
+                break;
+            case 1:
+                point = [[2, 1], [3, 1], [13, 1], [12, 1],
+                [2, 2], [3, 2], [13, 2], [12, 2],
+                [2, 3], [3, 3], [13, 3], [12, 3],
+                [5, 5], [6, 5], [7, 5], [8, 5], [9, 5], [10, 5],
+                [5, 6], [6, 6], [7, 6], [8, 6], [9, 6], [10, 6]
+                ];
+                break;
+            case 2:
+                point = [[1, 2], [5, 2], [10, 2], [14, 2],
+                [1, 3], [2, 3], [3, 3], [4, 3], [5, 3], [10, 3], [11, 3], [12, 3], [13, 3], [14, 3],
+                [2, 4], [3, 4], [4, 4], [11, 4], [12, 4], [13, 4],
+                [6, 6], [7, 6], [8, 6], [9, 6],
+                [5, 7], [10, 7]
+                ];
+                break;
+            case 3:
+                point = [[2, 1], [3, 1], [13, 1], [12, 1],
+                [2, 2], [3, 2], [13, 2], [12, 2],
+                [2, 3], [3, 3], [13, 3], [12, 3],
+                [5, 5], [10, 5],
+                [6, 6], [7, 6], [8, 6], [9, 6]
+                ];
+                break;
+            case 4:
+                point = [[2, 0], [13, 0],
+                [3, 1], [12, 1],
+                [3, 2], [4, 2], [11, 2], [12, 2],
+                [3, 3], [4, 3], [11, 3], [12, 3],
+                [6, 6], [7, 6], [8, 6], [9, 6],
+                [5, 7], [10, 7]
+                ];
+                break;
+        }
+        let index_max = point.length
+        for (let index = 0; index < index_max; index++) {
+            MatrixDraw(point[index][0], point[index][1])
+        }
+        MatrixRefresh();
     }
 
 }

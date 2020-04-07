@@ -9,7 +9,7 @@
     "files": [
         "README.md",
         "main.ts",
-		"ds18b20.cpp"
+        "ds18b20.cpp"
     ],
     "testFiles": [
         "test.ts"
