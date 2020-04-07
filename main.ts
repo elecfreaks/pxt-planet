@@ -771,8 +771,8 @@ namespace Planet {
     //% blockId=laserSensor block="at pin %Rjpin laser toggle to %laserstate"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% ledstate.fieldEditor="gridpicker"
-    //% ledstate.fieldOptions.columns=2
+    //% laserstate.fieldEditor="gridpicker"
+    //% laserstate.fieldOptions.columns=2
     //% subcategory=Output
     export function laserSensor(Rjpin: DigitalRJPin, laserstate: GeneralStateList): void {
         let pin = DigitalPin.P1
