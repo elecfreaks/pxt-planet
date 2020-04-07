@@ -205,7 +205,6 @@ namespace Planet {
     * get Ultrasonic distance
     */
     //% blockId=sonarbit block="at pin %Rjpin Ultrasonic distance in unit %distance_unit "
-    //% weight=1
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
     //% distance_unit.fieldEditor="gridpicker"
@@ -260,7 +259,6 @@ namespace Planet {
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
     //% subcategory=Sensor
-    //% weight=5
     export function NoiseSensor(Rjpin: AnalogRJPin): number {
         let pin = AnalogPin.P1
         switch (Rjpin) {
@@ -380,7 +378,7 @@ namespace Planet {
     //% blockId="LightSensor" block="at pin %Rjpin light intensity(0~100)"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor weight=10
+    //% subcategory=Sensor 
     export function LightSensor(Rjpin: AnalogRJPin): number {
         let pin = AnalogPin.P1
         switch (Rjpin) {
@@ -409,7 +407,7 @@ namespace Planet {
     //% blockId="readsoilmoisture" block="at pin %Rjpin Soil moisture(0~100)"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor weight=15
+    //% subcategory=Sensor 
     export function SoilHumidity(Rjpin: AnalogRJPin): number {
         let voltage = 0, soilmoisture = 0;
         let pin = AnalogPin.P1
@@ -438,7 +436,7 @@ namespace Planet {
     //% blockId="PIR" block="at pin %Rjpin PIR detects motion"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor weight=20
+    //% subcategory=Sensor 
     export function PIR(Rjpin: DigitalRJPin): boolean {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -469,7 +467,7 @@ namespace Planet {
     //% blockId="readWaterLevel" block="at pin %Rjpin water level(0~100)"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor weight=25
+    //% subcategory=Sensor 
     export function WaterLevel(Rjpin: AnalogRJPin): number {
         let pin = AnalogPin.P1
         switch (Rjpin) {
@@ -499,7 +497,7 @@ namespace Planet {
     //% blockId="readdust" block="at pin %Rjpin value of dust(μg/m³) "
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor weight=30
+    //% subcategory=Sensor 
     export function Dust(Rjpin: AnalogRJPin): number {
         let vLED: DigitalPin, vo: AnalogPin
         switch (Rjpin) {
@@ -533,7 +531,7 @@ namespace Planet {
     }
 
     //% block="at pin IIC BME280 %state value"
-    //% subcategory=Sensor weight=35
+    //% subcategory=Sensor 
     export function octopus_BME280(state: BME280_state): number {
         switch (state) {
             case 0:
@@ -566,7 +564,7 @@ namespace Planet {
     //% block="at pin %Rjpin ds18b20 Temperature(℃)value"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor weight=42
+    //% subcategory=Sensor
     export function Temperature18b20(Rjpin: DigitalRJPin): number {
         // Fake function for simulator
         let temp: number = 0;
@@ -627,20 +625,14 @@ namespace Planet {
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
     //% subcategory=Input
-    export function potentiometer(Rjpin: DigitalRJPin): number {
+    export function potentiometer(Rjpin: AnalogRJPin): number {
         let pin = AnalogPin.P1
         switch (Rjpin) {
-            case DigitalRJPin.J1:
+            case AnalogRJPin.J1:
                 pin = AnalogPin.P1
                 break;
-            case DigitalRJPin.J2:
+            case AnalogRJPin.J2:
                 pin = AnalogPin.P2
-                break;
-            case DigitalRJPin.J3:
-                pin = AnalogPin.P13
-                break;
-            case DigitalRJPin.J4:
-                pin = AnalogPin.P15
                 break;
         }
         return pins.analogReadPin(pin)
@@ -652,20 +644,14 @@ namespace Planet {
     //% key.fieldEditor="gridpicker"
     //% key.fieldOptions.columns=2
     //% subcategory=Input
-    export function ADKeyboard(Rjpin: DigitalRJPin, key: ADKeyList): boolean {
+    export function ADKeyboard(Rjpin: AnalogRJPin, key: ADKeyList): boolean {
         let pin = AnalogPin.P1
         switch (Rjpin) {
-            case DigitalRJPin.J1:
+            case AnalogRJPin.J1:
                 pin = AnalogPin.P1
                 break;
-            case DigitalRJPin.J2:
+            case AnalogRJPin.J2:
                 pin = AnalogPin.P2
-                break;
-            case DigitalRJPin.J3:
-                pin = AnalogPin.P13
-                break;
-            case DigitalRJPin.J4:
-                pin = AnalogPin.P15
                 break;
         }
         let Analog_number: number = pins.analogReadPin(pin);
