@@ -499,25 +499,17 @@ namespace Planet {
     //% blockId="readdust" block="at pin %Rjpin value of dust(μg/m³) "
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor
-    export function Dust(Rjpin: DigitalRJPin): number {
+    //% subcategory=Sensor weight=30
+    export function Dust(Rjpin: AnalogRJPin): number {
         let vLED: DigitalPin, vo: AnalogPin
         switch (Rjpin) {
-            case DigitalRJPin.J1:
-                vLED = DigitalPin.P1
-                vo = AnalogPin.P8
+            case AnalogRJPin.J1:
+                vLED = DigitalPin.P8
+                vo = AnalogPin.P1
                 break;
-            case DigitalRJPin.J2:
-                vLED = DigitalPin.P2
-                vo = AnalogPin.P12
-                break;
-            case DigitalRJPin.J3:
-                vLED = DigitalPin.P13
-                vo = AnalogPin.P14
-                break;
-            case DigitalRJPin.J4:
-                vLED = DigitalPin.P15
-                vo = AnalogPin.P16
+            case AnalogRJPin.J2:
+                vLED = DigitalPin.P12
+                vo = AnalogPin.P2
                 break;
         }
         let voltage = 0, dust = 0;
@@ -541,7 +533,7 @@ namespace Planet {
     }
 
     //% block="at pin IIC BME280 %state value"
-    //% subcategory=Sensor
+    //% subcategory=Sensor weight=35
     export function octopus_BME280(state: BME280_state): number {
         switch (state) {
             case 0:
@@ -574,7 +566,7 @@ namespace Planet {
     //% block="at pin %Rjpin ds18b20 Temperature(℃)value"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor
+    //% subcategory=Sensor weight=42
     export function Temperature18b20(Rjpin: DigitalRJPin): number {
         // Fake function for simulator
         let temp: number = 0;
