@@ -860,7 +860,7 @@ namespace Planet {
         }
     }
     //% block="at pin IIC Matrix Refresh"
-    //% group=Matrix
+    //% group=Matrix subcategory=Output
     export function MatrixRefresh(): void {
         if (!initializedMatrix) {
             matrixInit();
@@ -870,7 +870,7 @@ namespace Planet {
     }
 
     //% block="at pin IIC Matrix Clear"
-    //% group=Matrix
+    //% group=Matrix subcategory=Output
     export function MatrixClear(): void {
         if (!initializedMatrix) {
             matrixInit();
@@ -882,7 +882,7 @@ namespace Planet {
         matrixShow();
     }
     //% block="at pin IIC Matrix Draw|X %x|Y %y"
-    //% group=Matrix
+    //% group=Matrix subcategory=Output
     export function MatrixDraw(x: number, y: number): void {
         if (!initializedMatrix) {
             matrixInit();
@@ -898,7 +898,7 @@ namespace Planet {
         matBuf[idx + 1] = tmp;
     }
     //% block="at pin IIC Matrix show emoji %ID"
-    //% group=Matrix
+    //% group=Matrix subcategory=Output
     export function MatrixEmoji(ID: emojiList) {
         MatrixClear();
         let point;
