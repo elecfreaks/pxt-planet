@@ -3,7 +3,6 @@
 */
 //% color=#0000ff  icon="\uf06d" block="Planet" blockId="Planet"
 namespace Planet {
-
     let weatherMonitorStarted = false;
     // Keep Track of weather monitoring variables
     //let numRainDumps = 0
@@ -90,7 +89,7 @@ namespace Planet {
         //% block="J4 (P15,P16)"
         J4
     }
-    export enum AnalogRJPin{
+    export enum AnalogRJPin {
         //% block="J1 (P1,P8)"
         J1,
         //% block="J2 (P2,P12)"
@@ -206,13 +205,13 @@ namespace Planet {
     * get Ultrasonic distance
     */
     //% blockId=sonarbit block="at pin %Rjpin Ultrasonic distance in unit %distance_unit "
-    //% weight=10
+    //% weight=1
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
     //% distance_unit.fieldEditor="gridpicker"
     //% distance_unit.fieldOptions.columns=2
     //% subcategory=Sensor
-    export function Ultrasonic(Rjpin: DigitalRJPin, distance_unit: Distance_Unit_List): number {
+    export function Ultrasoundsensor(Rjpin: DigitalRJPin, distance_unit: Distance_Unit_List): number {
         let pin = DigitalPin.P1
         switch (Rjpin) {
             case DigitalRJPin.J1:
@@ -242,7 +241,6 @@ namespace Planet {
         if (distance > 400) {
             distance = 0
         }
-
         switch (distance_unit) {
             case Distance_Unit_List.Distance_Unit_cm:
                 return Math.floor(distance)  //cm
@@ -256,30 +254,24 @@ namespace Planet {
     }
     /** 
     * TODO: get noise(dB)
-    * @param noisepin describe parameter here, eg: AnalogPin.P1
+    * @param noisepin describe parameter here, eg: AnalogRJPin.J1
     */
-    //% blockId="readnoise" block="at pin %Rjpin Noise sensor volume"
+    //% blockId="readnoise" block="at pin %Rjpin Noise sensor volume(dB)"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
     //% subcategory=Sensor
-    export function Noise(Rjpin: DigitalRJPin): number {
+    //% weight=5
+    export function NoiseSensor(Rjpin: AnalogRJPin): number {
         let pin = AnalogPin.P1
         switch (Rjpin) {
-            case DigitalRJPin.J1:
+            case AnalogRJPin.J1:
                 pin = AnalogPin.P1
                 break;
-            case DigitalRJPin.J2:
+            case AnalogRJPin.J2:
                 pin = AnalogPin.P2
-                break;
-            case DigitalRJPin.J3:
-                pin = AnalogPin.P13
-                break;
-            case DigitalRJPin.J4:
-                pin = AnalogPin.P15
                 break;
         }
         let level = 0, voltage = 0, noise = 0, h = 0, l = 0, sumh = 0, suml = 0
-        pins.digitalWritePin(DigitalPin.P0, 0)
         for (let i = 0; i < 1000; i++) {
             level = level + pins.analogReadPin(pin)
         }
@@ -383,26 +375,20 @@ namespace Planet {
     }
     /**
     * TODO: get light intensity(0~100%)
-    * @param lightintensitypin describe parameter here, eg: AnalogPin.P1
+    * @param lightintensitypin describe parameter here, eg: AnalogRJPin.J1
     */
-    //% blockId="readlightintensity" block="at pin %Rjpin light intensity(0~100)"
+    //% blockId="LightSensor" block="at pin %Rjpin light intensity(0~100)"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor
-    export function LightIntensity(Rjpin: DigitalRJPin): number {
+    //% subcategory=Sensor weight=10
+    export function LightSensor(Rjpin: AnalogRJPin): number {
         let pin = AnalogPin.P1
         switch (Rjpin) {
-            case DigitalRJPin.J1:
+            case AnalogRJPin.J1:
                 pin = AnalogPin.P1
                 break;
-            case DigitalRJPin.J2:
+            case AnalogRJPin.J2:
                 pin = AnalogPin.P2
-                break;
-            case DigitalRJPin.J3:
-                pin = AnalogPin.P13
-                break;
-            case DigitalRJPin.J4:
-                pin = AnalogPin.P15
                 break;
         }
         let voltage = 0, lightintensity = 0;
@@ -418,27 +404,21 @@ namespace Planet {
     }
     /**
     * TODO: get soil moisture(0~100%)
-    * @param soilmoisturepin describe parameter here, eg: AnalogPin.P1
+    * @param soilmoisturepin describe parameter here, eg: AnalogRJPin.J1
     */
     //% blockId="readsoilmoisture" block="at pin %Rjpin Soil moisture(0~100)"
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor
-    export function SoilHumidity(Rjpin: DigitalRJPin): number {
+    //% subcategory=Sensor weight=15
+    export function SoilHumidity(Rjpin: AnalogRJPin): number {
         let voltage = 0, soilmoisture = 0;
         let pin = AnalogPin.P1
         switch (Rjpin) {
-            case DigitalRJPin.J1:
+            case AnalogRJPin.J1:
                 pin = AnalogPin.P1
                 break;
-            case DigitalRJPin.J2:
+            case AnalogRJPin.J2:
                 pin = AnalogPin.P2
-                break;
-            case DigitalRJPin.J3:
-                pin = AnalogPin.P13
-                break;
-            case DigitalRJPin.J4:
-                pin = AnalogPin.P15
                 break;
         }
         voltage = pins.map(
