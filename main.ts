@@ -478,36 +478,7 @@ namespace Planet_A {
         waterlevel = voltage;
         return Math.round(waterlevel)
     }
-    //% shim=DS18B20::Temperature
-    export function Temperature_read(p: number): number {
-        // Fake function for simulator
-        return 0
-    }
 
-    //% block="at pin %Rjpin ds18b20 Temperature(℃)value"
-    //% Rjpin.fieldEditor="gridpicker"
-    //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor
-    export function Temperature18b20(Rjpin: DigitalRJPin): number {
-        // Fake function for simulator
-        let temp: number = 0;
-        switch (Rjpin) {
-            case DigitalRJPin.J1:
-                temp = Temperature_read(1)
-                break;
-            case DigitalRJPin.J2:
-                temp = Temperature_read(2)
-                break;
-            case DigitalRJPin.J3:
-                temp = Temperature_read(13)
-                break;
-            case DigitalRJPin.J4:
-                temp = Temperature_read(15)
-                break;
-        }
-        temp = temp / 100
-        return temp
-    }
     /**
     * get UV level value (0~15)
     * @param waterlevelpin describe parameter here, eg: AnalogRJPin.J1
