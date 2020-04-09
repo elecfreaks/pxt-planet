@@ -2,9 +2,8 @@
 * Functions to Planet sensor by ELECFREAKS Co.,Ltd.
 */
 //% color=#191970  icon="\uf06d" block="Planet_A" blockId="Planet_A"
-//% groups='["Basic", "display","IIC"]'
+//% groups='["Basic", "7-Seg 4-Dig LED Nixietube","IIC"]'
 namespace Planet_A {
-
     ///////////////////////////// BME280 
     let BME280_I2C_ADDR = 0x76
     let dig_T1 = getUInt16LE(0x88)
@@ -975,7 +974,7 @@ namespace Planet_A {
      * @param dataPin value of data pin number
      */
     //% blockId=grove_tm1637_create block="connect 4-Digit Display |pin %pin|"
-    //% subcategory=Output group="display" blockSetVariable=display
+    //% subcategory=Output group="7-Seg 4-Dig LED Nixietube" blockSetVariable=display
     //% weight = 1
     export function createDisplay(Rjpin: DigitalRJPin): TM1637 {
         let display = new TM1637()
@@ -1054,7 +1053,7 @@ namespace Planet_A {
          * @param dispData value of number
          */
         //% blockId=grove_tm1637_display_number block="%display|show number|%dispData"
-        //% subcategory=Output group="display"
+        //% subcategory=Output group="7-Seg 4-Dig LED Nixietube"
         show(dispData: number, fillWithZeros = false) {
             let def = 0x7f
             if (fillWithZeros)
@@ -1111,7 +1110,7 @@ namespace Planet_A {
          */
         //% blockId=grove_tm1637_set_display_level block="%display|brightness level to|%level"
         //% level.min=0 level.max=7
-        //% subcategory=Output group="display"
+        //% subcategory=Output group="7-Seg 4-Dig LED Nixietube"
         set(level: number) {
             this.brightnessLevel = level
 
@@ -1129,7 +1128,7 @@ namespace Planet_A {
         //% blockId=grove_tm1637_display_bit block="%display|show single number|%dispData|at digit|%bitAddr"
         //% dispData.min=0 dispData.max=9
         //% bitAddr.min=0 bitAddr.max=3
-        //% subcategory=Output group="display"
+        //% subcategory=Output group="7-Seg 4-Dig LED Nixietube"
         bit(dispData: number, bitAddr: number) {
             if ((dispData == 0x7f) || (dispData == 0x3f) || ((dispData <= 9) && (bitAddr <= 3))) {
                 let segData = 0
@@ -1158,7 +1157,7 @@ namespace Planet_A {
          * @param pointEn value of point switch
          */
         //% blockId=grove_tm1637_display_point block="%display|turn|%point|colon point"
-        //% subcategory=Output group="display"
+        //% subcategory=Output group="7-Seg 4-Dig LED Nixietube"
         point(b: boolean) {
             this.pointFlag = b
             this.bit(this.buf[1], 0x01)
@@ -1168,7 +1167,7 @@ namespace Planet_A {
          * Clear the display
          */
         //% blockId=grove_tm1637_display_clear block="%display|clear"
-        //% subcategory=Output group="display"
+        //% subcategory=Output group="7-Seg 4-Dig LED Nixietube"
         clear() {
             this.bit(0x7f, 0x00)
             this.bit(0x7f, 0x01)
