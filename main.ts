@@ -664,8 +664,8 @@ namespace Planet_A {
     * get dht11 temperature and humidity Value
     * @param dht11pin describe parameter here, eg: DigitalPin.P15     */
     //% blockId="readdht11" block="at pin %Rjpin dht11 value of %dht11state"
-    //% Rjpin.fieldEditor="gridpicker"
-    //% Rjpin.fieldOptions.columns=2
+    //% Rjpin.fieldEditor="gridpicker" dht11state.fieldEditor="gridpicker"
+    //% Rjpin.fieldOptions.columns=2 dht11state.fieldOptions.columns=1
     //% subcategory=Sensor 
     export function temperature(Rjpin: DigitalRJPin,dht11state: DHT11_state): number {
         let pin = DigitalPin.P1
@@ -754,6 +754,7 @@ namespace Planet_A {
 
 
     //% block="at pin IIC BME280 %state value"
+    //% state.fieldEditor="gridpicker" state.fieldOptions.columns=1
     //% subcategory=Sensor 
     export function octopus_BME280(state: BME280_state): number {
         switch (state) {
@@ -787,6 +788,7 @@ namespace Planet_A {
         * @param handler code to run
     */
     //% blockId= gesture_create_event block="at pin IIC Gesture %gesture"
+    //% gesture.fieldEditor="gridpicker" gesture.fieldOptions.columns=3
     //% subcategory=Sensor
     export function onGesture(gesture: gestureType, handler: () => void) {
         control.onEvent(gestureEventId, gesture, handler);
@@ -935,7 +937,7 @@ namespace Planet_A {
     //% Rjpin.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2
     //% Relaystate.fieldEditor="gridpicker"
-    //% Relaystate.fieldOptions.columns=2
+    //% Relaystate.fieldOptions.columns=1
     //% subcategory=Output group=basic
     export function Relay(Rjpin: DigitalRJPin, Relaystate: RelayStateList): void {
         let pin = DigitalPin.P1
