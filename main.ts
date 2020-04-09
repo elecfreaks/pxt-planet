@@ -1,8 +1,8 @@
 /**
 * Functions to Planet sensor by ELECFREAKS Co.,Ltd.
 */
-//% color=#0000ff  icon="\uf06d" block="Planet" blockId="Planet"
-namespace Planet {
+//% color=#0000ff  icon="\uf06d" block="Planet_A" blockId="Planet_A"
+namespace Planet_A {
 
     ///////////////////////////// BME280 
     let BME280_I2C_ADDR = 0x76
@@ -478,47 +478,6 @@ namespace Planet {
         waterlevel = voltage;
         return Math.round(waterlevel)
     }
-    /**
-     * get dust value (μg/m³) 
-    * @param vLED describe parameter here, eg: DigitalPin.P16
-     * @param vo describe parameter here, eg: AnalogPin.P1
-    */
-    //% blockId="readdust" block="at pin %Rjpin value of dust(μg/m³) "
-    //% Rjpin.fieldEditor="gridpicker"
-    //% Rjpin.fieldOptions.columns=2
-    //% subcategory=Sensor 
-    export function Dust(Rjpin: AnalogRJPin): number {
-        let vLED: DigitalPin, vo: AnalogPin
-        switch (Rjpin) {
-            case AnalogRJPin.J1:
-                vLED = DigitalPin.P8
-                vo = AnalogPin.P1
-                break;
-            case AnalogRJPin.J2:
-                vLED = DigitalPin.P12
-                vo = AnalogPin.P2
-                break;
-        }
-        let voltage = 0, dust = 0;
-        pins.digitalWritePin(vLED, 0);
-        control.waitMicros(160);
-        voltage = pins.analogReadPin(vo);
-        control.waitMicros(100);
-        pins.digitalWritePin(vLED, 1);
-        voltage = pins.map(
-            voltage,
-            0,
-            1023,
-            0,
-            3100 / 2 * 3
-        );
-        dust = (voltage - 380) * 5 / 29;
-        if (dust < 0) {
-            dust = 0
-        }
-        return Math.round(dust)
-    }
-
     //% shim=DS18B20::Temperature
     export function Temperature_read(p: number): number {
         // Fake function for simulator
@@ -656,67 +615,7 @@ namespace Planet {
         return pins.analogReadPin(pin)
     }
 
-    //% block="at pin %Rjpin ADKeyboard key %key is pressed"
-    //% Rjpin.fieldEditor="gridpicker"
-    //% Rjpin.fieldOptions.columns=2
-    //% key.fieldEditor="gridpicker"
-    //% key.fieldOptions.columns=2
-    //% subcategory=Input
-    export function ADKeyboard(Rjpin: AnalogRJPin, key: ADKeyList): boolean {
-        let pin = AnalogPin.P1
-        switch (Rjpin) {
-            case AnalogRJPin.J1:
-                pin = AnalogPin.P1
-                break;
-            case AnalogRJPin.J2:
-                pin = AnalogPin.P2
-                break;
-        }
-        let Analog_number: number = pins.analogReadPin(pin);
-        switch (key) {
-            case ADKeyList.A:
-                if (Analog_number < 10) {
-                    return true;
-                }
-                else {
-                    return false
-                }
-                break;
-            case ADKeyList.B:
-                if (Analog_number >= 40 && Analog_number <= 60) {
-                    return true;
-                }
-                else {
-                    return false
-                }
-                break;
-            case ADKeyList.C:
-                if (Analog_number >= 80 && Analog_number <= 110) {
-                    return true;
-                }
-                else {
-                    return false
-                }
-                break;
-            case ADKeyList.D:
-                if (Analog_number >= 130 && Analog_number <= 150) {
-                    return true;
-                }
-                else {
-                    return false
-                }
-                break;
-            case ADKeyList.E:
-                if (Analog_number >= 530 && Analog_number <= 560) {
-                    return true;
-                }
-                else {
-                    return false
-                }
-                break;
-
-        }
-    }
+ 
 
     /**Output sensor*******************星宿传感器************************************* */
 
