@@ -550,7 +550,7 @@ private setPixelW(pixeloffset: number, white: number): void
 //% parts="neopixel"
 //% trackArgs=0,2
 //% blockSetVariable=strip
-export function create(Rjpin: DigitalPin, numleds: number, mode: NeoPixelMode): Strip
+export function create(Rjpin: DigitalRJPin, numleds: number, mode: NeoPixelMode): Strip
 {
 	let pin = DigitalPin.P1
 	switch (Rjpin)
