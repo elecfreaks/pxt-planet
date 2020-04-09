@@ -132,6 +132,17 @@ namespace Planet_A {
         //% block="altitude(M)" enumval=3
         BME280_altitude,
     }
+    export enum DHT11_state {
+        //% block="temperature(℃)" enumval=0
+        DHT11_temperature_C,
+
+        //% block="temperature(℉)" enumval=1
+        DHT11_temperature_F,
+
+        //% block="humidity(0~100)" enumval=2
+        DHT11_humidity,
+    }
+
 
     function setreg(reg: number, dat: number): void {
         let buf = pins.createBuffer(2);
@@ -507,6 +518,97 @@ namespace Planet_A {
         );
         return Math.round(UVlevel)
     }
+    /**
+    * get dht11 temperature and humidity Value
+    * @param dht11pin describe parameter here, eg: DigitalPin.P15     */
+    //% blockId="readdht11" block="at pin %Rjpin dht11 value of  %dht11state"
+    //% Rjpin.fieldEditor="gridpicker"
+    //% Rjpin.fieldOptions.columns=2
+    //% subcategory=Sensor 
+    export function temperature(dht11state: DHT11_state, Rjpin: DigitalRJPin): number {
+        let pin = DigitalPin.P1
+        switch (Rjpin) {
+            case DigitalRJPin.J1:
+                pin = DigitalPin.P1
+                break;
+            case DigitalRJPin.J2:
+                pin = DigitalPin.P2
+                break;
+            case DigitalRJPin.J3:
+                pin = DigitalPin.P13
+                break;
+            case DigitalRJPin.J4:
+                pin = DigitalPin.P15
+                break;
+        }
+        pins.digitalWritePin(pin, 0)
+        basic.pause(18)
+        let i = pins.digitalReadPin(pin)
+        pins.setPull(pin, PinPullMode.PullUp);
+        switch (dht11state) {
+            case 0:
+                let dhtvalue1 = 0;
+                let dhtcounter1 = 0;
+                while (pins.digitalReadPin(pin) == 1);
+                while (pins.digitalReadPin(pin) == 0);
+                while (pins.digitalReadPin(pin) == 1);
+                for (let i = 0; i <= 32 - 1; i++) {
+                    while (pins.digitalReadPin(pin) == 0);
+                    dhtcounter1 = 0
+                    while (pins.digitalReadPin(pin) == 1) {
+                        dhtcounter1 += 1;
+                    }
+                    if (i > 15) {
+                        if (dhtcounter1 > 2) {
+                            dhtvalue1 = dhtvalue1 + (1 << (31 - i));
+                        }
+                    }
+                }
+                return ((dhtvalue1 & 0x0000ff00) >> 8);
+                break;
+            case 1:
+                while (pins.digitalReadPin(pin) == 1);
+                while (pins.digitalReadPin(pin) == 0);
+                while (pins.digitalReadPin(pin) == 1);
+                let dhtvalue = 0;
+                let dhtcounter = 0;
+                for (let i = 0; i <= 32 - 1; i++) {
+                    while (pins.digitalReadPin(pin) == 0);
+                    dhtcounter = 0
+                    while (pins.digitalReadPin(pin) == 1) {
+                        dhtcounter += 1;
+                    }
+                    if (i > 15) {
+                        if (dhtcounter > 2) {
+                            dhtvalue = dhtvalue + (1 << (31 - i));
+                        }
+                    }
+                }
+                return Math.round((((dhtvalue & 0x0000ff00) >> 8) * 9 / 5) + 32);
+                break;
+            case 2:
+                while (pins.digitalReadPin(pin) == 1);
+                while (pins.digitalReadPin(pin) == 0);
+                while (pins.digitalReadPin(pin) == 1);
+
+                let value = 0;
+                let counter = 0;
+
+                for (let i = 0; i <= 8 - 1; i++) {
+                    while (pins.digitalReadPin(pin) == 0);
+                    counter = 0
+                    while (pins.digitalReadPin(pin) == 1) {
+                        counter += 1;
+                    }
+                    if (counter > 3) {
+                        value = value + (1 << (7 - i));
+                    }
+                }
+                return value;
+            default:
+                return 0;
+        }
+    }
 
 
     //% block="at pin IIC BME280 %state value"
@@ -534,6 +636,7 @@ namespace Planet_A {
         }
         return 0;
     }
+
 
     /**Input sensor*******************星宿传感器************************************* */
 
@@ -586,7 +689,7 @@ namespace Planet_A {
         return pins.analogReadPin(pin)
     }
 
- 
+
 
     /**Output sensor*******************星宿传感器************************************* */
 
