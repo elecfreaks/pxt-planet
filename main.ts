@@ -2,6 +2,7 @@
 * Functions to Planet sensor by ELECFREAKS Co.,Ltd.
 */
 //% color=#191970  icon="\uf06d" block="Planet_A" blockId="Planet_A"
+//% groups='["Basic", "display","IIC"]'
 namespace Planet_A {
 
     ///////////////////////////// BME280 
@@ -99,6 +100,10 @@ namespace Planet_A {
         0x6F, 0x32, 0x71, 0x00, 0x72, 0x01, 0x73, 0x35, 0x74, 0x00, 0x75, 0x33, 0x76, 0x31, 0x77, 0x01,
         0x7C, 0x84, 0x7D, 0x03, 0x7E, 0x01
     ];
+    let TubeTab: number[] = [
+        0x3f, 0x06, 0x5b, 0x4f, 0x66, 0x6d, 0x7d, 0x07,
+        0x7f, 0x6f, 0x77, 0x7c, 0x39, 0x5e, 0x79, 0x71
+    ]
     ///////////////////////////////
     export enum DigitalRJPin {
         //% block="J1 (P1,P8)"
@@ -667,7 +672,7 @@ namespace Planet_A {
     //% Rjpin.fieldEditor="gridpicker" dht11state.fieldEditor="gridpicker"
     //% Rjpin.fieldOptions.columns=2 dht11state.fieldOptions.columns=1
     //% subcategory=Sensor 
-    export function temperature(Rjpin: DigitalRJPin,dht11state: DHT11_state): number {
+    export function temperature(Rjpin: DigitalRJPin, dht11state: DHT11_state): number {
         let pin = DigitalPin.P1
         switch (Rjpin) {
             case DigitalRJPin.J1:
@@ -870,7 +875,7 @@ namespace Planet_A {
     //% Rjpin.fieldOptions.columns=2
     //% ledstate.fieldEditor="gridpicker"
     //% ledstate.fieldOptions.columns=2
-    //% subcategory=Output group=basic
+    //% subcategory=Output group="basic"
     export function LED(Rjpin: DigitalRJPin, ledstate: GeneralStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -904,7 +909,7 @@ namespace Planet_A {
     //% Rjpin.fieldOptions.columns=2
     //% laserstate.fieldEditor="gridpicker"
     //% laserstate.fieldOptions.columns=2
-    //% subcategory=Output group=basic
+    //% subcategory=Output group="basic"
     export function laserSensor(Rjpin: DigitalRJPin, laserstate: GeneralStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -938,7 +943,7 @@ namespace Planet_A {
     //% Rjpin.fieldOptions.columns=2
     //% Relaystate.fieldEditor="gridpicker"
     //% Relaystate.fieldOptions.columns=1
-    //% subcategory=Output group=basic
+    //% subcategory=Output group="basic"
     export function Relay(Rjpin: DigitalRJPin, Relaystate: RelayStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -962,6 +967,205 @@ namespace Planet_A {
             case RelayStateList.Off:
                 pins.digitalWritePin(pin, 1)
                 break;
+        }
+    }
+    /**
+     * Create a new driver Grove - 4-Digit Display
+     * @param clkPin value of clk pin number
+     * @param dataPin value of data pin number
+     */
+    //% blockId=grove_tm1637_create block="connect 4-Digit Display |pin %pin|"
+    //% subcategory=Output group="display" blockSetVariable=display
+    //% weight = 1
+    export function createDisplay(Rjpin: DigitalRJPin): TM1637 {
+        let display = new TM1637()
+        switch (Rjpin) {
+            case 1:
+                display.clkPin = DigitalPin.P1
+                display.dataPin = DigitalPin.P8
+                break;
+            case 2:
+                display.clkPin = DigitalPin.P2
+                display.dataPin = DigitalPin.P16
+                break;
+        }
+        display.buf = pins.createBuffer(4)
+        display.brightnessLevel = 7
+        display.pointFlag = false
+        display.clear()
+
+        return display
+    }
+    export class TM1637 {
+        clkPin: DigitalPin
+        dataPin: DigitalPin
+        brightnessLevel: number
+        pointFlag: boolean
+        buf: Buffer
+
+        private writeByte(wrData: number) {
+            for (let i = 0; i < 8; i++) {
+                pins.digitalWritePin(this.clkPin, 0)
+                if (wrData & 0x01) pins.digitalWritePin(this.dataPin, 1)
+                else pins.digitalWritePin(this.dataPin, 0)
+                wrData >>= 1
+                pins.digitalWritePin(this.clkPin, 1)
+            }
+
+            pins.digitalWritePin(this.clkPin, 0) // Wait for ACK
+            pins.digitalWritePin(this.dataPin, 1)
+            pins.digitalWritePin(this.clkPin, 1)
+        }
+
+        private start() {
+            pins.digitalWritePin(this.clkPin, 1)
+            pins.digitalWritePin(this.dataPin, 1)
+            pins.digitalWritePin(this.dataPin, 0)
+            pins.digitalWritePin(this.clkPin, 0)
+        }
+
+        private stop() {
+            pins.digitalWritePin(this.clkPin, 0)
+            pins.digitalWritePin(this.dataPin, 0)
+            pins.digitalWritePin(this.clkPin, 1)
+            pins.digitalWritePin(this.dataPin, 1)
+        }
+
+        private coding(dispData: number): number {
+            let pointData = 0
+
+            if (dispData == 0x7f) dispData = 0x00
+            else if (dispData == 0x3f) dispData = 0x3f
+            else dispData = TubeTab[dispData] + pointData
+
+            return dispData
+        }
+
+        /**
+         * Show a 4 digits number on display
+         * @param dispData value of number
+         */
+        //% blockId=grove_tm1637_display_number block="%display|show number|%dispData"
+        //% subcategory=Output group="display"
+        show(dispData: number, fillWithZeros = false) {
+            let def = 0x7f
+            if (fillWithZeros)
+                def = 0x3f
+            if (dispData < 10) {
+                this.bit(dispData, 3)
+                this.bit(def, 2)
+                this.bit(def, 1)
+                this.bit(def, 0)
+
+                this.buf[3] = dispData
+                this.buf[2] = def
+                this.buf[1] = def
+                this.buf[0] = def
+            }
+            else if (dispData < 100) {
+                this.bit(dispData % 10, 3)
+                this.bit((dispData / 10) % 10, 2)
+                this.bit(def, 1)
+                this.bit(def, 0)
+
+                this.buf[3] = dispData % 10
+                this.buf[2] = (dispData / 10) % 10
+                this.buf[1] = def
+                this.buf[0] = def
+            }
+            else if (dispData < 1000) {
+                this.bit(dispData % 10, 3)
+                this.bit((dispData / 10) % 10, 2)
+                this.bit((dispData / 100) % 10, 1)
+                this.bit(def, 0)
+
+                this.buf[3] = dispData % 10
+                this.buf[2] = (dispData / 10) % 10
+                this.buf[1] = (dispData / 100) % 10
+                this.buf[0] = def
+            }
+            else {
+                this.bit(dispData % 10, 3)
+                this.bit((dispData / 10) % 10, 2)
+                this.bit((dispData / 100) % 10, 1)
+                this.bit((dispData / 1000) % 10, 0)
+
+                this.buf[3] = dispData % 10
+                this.buf[2] = (dispData / 10) % 10
+                this.buf[1] = (dispData / 100) % 10
+                this.buf[0] = (dispData / 1000) % 10
+            }
+        }
+
+        /**
+         * Set the brightness level of display at from 0 to 7
+         * @param level value of brightness level
+         */
+        //% blockId=grove_tm1637_set_display_level block="%display|brightness level to|%level"
+        //% level.min=0 level.max=7
+        //% subcategory=Output group="display"
+        set(level: number) {
+            this.brightnessLevel = level
+
+            this.bit(this.buf[0], 0x00)
+            this.bit(this.buf[1], 0x01)
+            this.bit(this.buf[2], 0x02)
+            this.bit(this.buf[3], 0x03)
+        }
+
+        /**
+         * Show a single number from 0 to 9 at a specified digit of Grove - 4-Digit Display
+         * @param dispData value of number
+         * @param bitAddr value of bit number
+         */
+        //% blockId=grove_tm1637_display_bit block="%display|show single number|%dispData|at digit|%bitAddr"
+        //% dispData.min=0 dispData.max=9
+        //% bitAddr.min=0 bitAddr.max=3
+        //% subcategory=Output group="display"
+        bit(dispData: number, bitAddr: number) {
+            if ((dispData == 0x7f) || (dispData == 0x3f) || ((dispData <= 9) && (bitAddr <= 3))) {
+                let segData = 0
+
+                if (bitAddr == 1 && this.pointFlag)
+                    segData = this.coding(dispData) + 0x80
+                else
+                    segData = this.coding(dispData)
+                this.start()
+                this.writeByte(0x44)
+                this.stop()
+                this.start()
+                this.writeByte(bitAddr | 0xc0)
+                this.writeByte(segData)
+                this.stop()
+                this.start()
+                this.writeByte(0x88 + this.brightnessLevel)
+                this.stop()
+
+                this.buf[bitAddr] = dispData
+            }
+        }
+
+        /**
+         * Turn on or off the colon point on Grove - 4-Digit Display
+         * @param pointEn value of point switch
+         */
+        //% blockId=grove_tm1637_display_point block="%display|turn|%point|colon point"
+        //% subcategory=Output group="display"
+        point(b: boolean) {
+            this.pointFlag = b
+            this.bit(this.buf[1], 0x01)
+        }
+
+        /**
+         * Clear the display
+         */
+        //% blockId=grove_tm1637_display_clear block="%display|clear"
+        //% subcategory=Output group="display"
+        clear() {
+            this.bit(0x7f, 0x00)
+            this.bit(0x7f, 0x01)
+            this.bit(0x7f, 0x02)
+            this.bit(0x7f, 0x03)
         }
     }
 }
