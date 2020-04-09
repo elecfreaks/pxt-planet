@@ -10,6 +10,7 @@
         "README.md",
         "main.ts",
 		"neopixel.ts",
+		"oled.ts",
         "ds18b20.cpp"
     ],
     "testFiles": [
