@@ -4,7 +4,6 @@
 //% color=#191970  icon="\uf06d" block="Planet_A" blockId="Planet_A"
 //% groups='["Basic", "display","IIC"]'
 namespace Planet_A {
-
     ///////////////////////////// BME280 
     let BME280_I2C_ADDR = 0x76
     let dig_T1 = getUInt16LE(0x88)
