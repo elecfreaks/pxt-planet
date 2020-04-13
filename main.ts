@@ -33,41 +33,7 @@ namespace Planet_A {
     setreg(0xF5, 0x0C)
     setreg(0xF4, 0x2F)
 
-    let digT1Val = 0
-    let digT2Val = 0
-    let digT3Val = 0
 
-    let digH1Val = 0
-    let digH2Val = 0
-    let digH3Val = 0
-    let digH4Val = 0
-    let digH5Val = 0
-    let digH6Val = 0
-
-    let digPBuf: Buffer
-
-    const digT1 = 0x88
-    const digT2 = 0x8A
-    const digT3 = 0x8C
-
-    const digP1 = 0x8E
-    const digP2 = 0x90
-    const digP3 = 0x92
-    const digP4 = 0x94
-    const digP5 = 0x96
-    const digP6 = 0x98
-    const digP7 = 0x9A
-    const digP8 = 0x9C
-    const digP9 = 0x9E
-
-    const digH1 = 0xA1
-    const digH2 = 0xE1
-    const digH3 = 0xE3
-    const e5Reg = 0xE5
-    const e4Reg = 0xE4
-    const e6Reg = 0xE6
-    const digH6 = 0xE7
-    ///////////////////////////////
 
     const initRegisterArray: number[] = [
         0xEF, 0x00, 0x32, 0x29, 0x33, 0x01, 0x34, 0x00, 0x35, 0x01, 0x36, 0x00, 0x37, 0x07, 0x38, 0x17,
@@ -134,6 +100,14 @@ namespace Planet_A {
 
         //% block="Off"
         Off
+    }
+    export enum ButtonStateList {
+        //% block="A"
+        A,
+        //% block="B"
+        B,
+        //% block="AB"
+        AB
     }
     export enum ADKeyList {
         //% block="A"
@@ -861,7 +835,46 @@ namespace Planet_A {
         }
         return pins.analogReadPin(pin)
     }
-
+    //% blockId=buttonab block="at pin %Rjpin Button %button is pressed"
+    //% Rjpin.fieldEditor="gridpicker"
+    //% Rjpin.fieldOptions.columns=2
+    //% button.fieldEditor="gridpicker"
+    //% button.fieldOptions.columns=1
+    //% subcategory=Input
+    export function buttonAB(Rjpin: DigitalRJPin, button: ButtonStateList): boolean {
+        let pinA = DigitalPin.P1
+        let pinB = DigitalPin.P2
+        switch (Rjpin) {
+            case DigitalRJPin.J1:
+                pinA = DigitalPin.P1
+                pinB = DigitalPin.P8
+                break;
+            case DigitalRJPin.J2:
+                pinA = DigitalPin.P2
+                pinB = DigitalPin.P2
+                break;
+            case DigitalRJPin.J3:
+                pinA = DigitalPin.P13
+                pinB = DigitalPin.P14
+                break;
+            case DigitalRJPin.J4:
+                pinA = DigitalPin.P15
+                pinB = DigitalPin.P16
+                break;
+        }
+        if (pins.digitalReadPin(pinA) == 1 && ButtonStateList.A) {
+            return true
+        }
+        else if (pins.digitalReadPin(pinB) == 1 && ButtonStateList.B){
+            return true
+        }
+        else if (pins.digitalReadPin(pinB) == 1 && pins.digitalReadPin(pinA) == 1&&ButtonStateList.AB) {
+            return true
+        }
+        else{
+            return false
+        }
+    }
 
 
     /**Output sensor*******************星宿传感器************************************* */
@@ -874,7 +887,7 @@ namespace Planet_A {
     //% Rjpin.fieldOptions.columns=2
     //% ledstate.fieldEditor="gridpicker"
     //% ledstate.fieldOptions.columns=2
-    //% subcategory=Output group="basic"
+    //% subcategory=Output group="Basic"
     export function LED(Rjpin: DigitalRJPin, ledstate: GeneralStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -908,7 +921,7 @@ namespace Planet_A {
     //% Rjpin.fieldOptions.columns=2
     //% laserstate.fieldEditor="gridpicker"
     //% laserstate.fieldOptions.columns=2
-    //% subcategory=Output group="basic"
+    //% subcategory=Output group="Basic"
     export function laserSensor(Rjpin: DigitalRJPin, laserstate: GeneralStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -942,7 +955,7 @@ namespace Planet_A {
     //% Rjpin.fieldOptions.columns=2
     //% Relaystate.fieldEditor="gridpicker"
     //% Relaystate.fieldOptions.columns=1
-    //% subcategory=Output group="basic"
+    //% subcategory=Output group="Basic"
     export function Relay(Rjpin: DigitalRJPin, Relaystate: RelayStateList): void {
         let pin = DigitalPin.P1
         switch (Rjpin) {
@@ -1159,6 +1172,7 @@ namespace Planet_A {
         //% blockId=grove_tm1637_display_point block="%display|turn|%point|colon point"
         //% subcategory=Output group="7-Seg 4-Dig LED Nixietube"
         point(b: boolean) {
+            
             this.pointFlag = b
             this.bit(this.buf[1], 0x01)
         }
